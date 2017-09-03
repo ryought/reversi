@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+  <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{ message }}
+
+    <ul is="transition-group">
+      <li v-for="user in users" :key="user['.key']">
+        <span>{{user.name}} - {{user.email}}</span>
+        <button v-on:click="removeUser(user)">X</button>
+      </li>
+    </ul>
+    
+    <form id="form" v-on:submit.prevent="addUser">
+      <input type="text" v-model="newUser.name" placeholder="username">
+      <input type="email" v-model="newUser.email" placeholder="email">
+      <input type="submit" value="add user">
+    </form>
+  </div>
+
+  <script>
+    // setup Firebase
+    var config = {
+      apiKey: "AIzaSyCJ5-wGuwje-5LqhpMNgs3SUbyil3V3WMI",
+      authDomain: "icf-09-registration.firebaseapp.com",
+      databaseURL: "https://icf-09-registration.firebaseio.com",
+      projectId: "icf-09-registration",
+      storageBucket: "icf-09-registration.appspot.com",
+      messagingSenderId: "385260940809"
+    };
+    firebase.initializeApp(config);
+
+    var usersRef = firebase.database().ref('test');
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!',
+        newUser: {
+          name: '',
+          email: '',
+        },
+      },
+
+      firebase: {
+        users: usersRef
+      },
+
+      methods: {
+        addUser: function() {
+          usersRef.push(this.newUser);
+          this.newUser.name = '';
+          this.newUser.email = '';
+        },
+        removeUser: function(user) {
+          usersRef.child(user['.key']).remove()
+        }
+      }
+    })
+
+
+  </script>
+</body>
+</html>
