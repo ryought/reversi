@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="./vue"></script>
+</head>
+<body>
+  <div id="app">
+    <table>
+        <tr v-for="(row, i) in board">
+          <td v-for="(elem, j) in row">
+            <button @click="putPin(i,j,1)">{{elem}}</button>
+          </td>
+        </tr>
+    </table>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        board: [[0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]],
+        x: 1-1,
+        y: 0,
+      }, 
+      created: function() {
+        console.log('work');
+      },
+      methods: {
+        putPin: function(x, y, color) {
+          // board変更
+          this.board[x].splice(y, 1, color);
+          // その他のアップデート
+          this.updateBoard(x, y, color);
+        },
+
+        // f: board -> board
+        updateBoard: function(x, y, color) {
+          // 一番近い自分の色を探す
+          console.log(this.board);
+          // そのポジションまで塗る
+        },
+
+        getNearestPosition: function(board, x, y, color, direction) {
+          switch(direction) {
+            case 1:
+              break;
+          }
+        },
+
+        sendMessage: function() {
+          console.log('hoge');
+        },
+
+        getReversePositions: function(x, y, color) {
+          board = this.board;
+          x = this.x;
+          y = this.y;
+          // 上
+          let move = [0,0,0,0,0,0,0,0]; // どの方向にどれだけ進むか
+          // 自分の色と反対の色を進む　自分の色が出てきたら止まる 出てこなかったらエラー
+          var i;
+          for(i=y+1; i<=4 && board[x][i] == -1*color; i++);
+          if(i<=4 && board[x][i] == color){
+            move[0] = i;
+          }
+          console.log(move);
+        }
+      }
+    })
+  </script>
+</body>
+</html>

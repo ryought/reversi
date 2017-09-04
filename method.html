@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+  <div id="app">
+    {{ message }}
+    <button @click="greet">hoge</button>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
+      },
+      computed: {
+        isValid: function() {
+          return this.message.length > 10
+        }
+      },
+      methods: {
+        greet: function() {
+          alert('hoge');
+        }
+      }
+    })
+  </script>
+</body>
+</html>
