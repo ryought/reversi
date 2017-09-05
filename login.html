@@ -8,11 +8,6 @@
 </head>
 <body>
   <div id="app">
-    <form id="form" v-on:submit.prevent="register">
-      <input type="text" v-model="newUser.name" placeholder="username">
-      <input type="email" v-model="newUser.email" placeholder="email">
-      <input type="submit" value="add user">
-    </form>
     <form id="form" v-on:submit.prevent="createUser">
       <input type="text" v-model="user.email" placeholder="email">
       <input type="password" v-model="user.password" placeholder="pass">
@@ -65,12 +60,12 @@
           this.email = this.User.email;
           this.uid = this.User.uid;
         }
-
+        let self = this;
         firebase.auth().onAuthStateChanged(function(user) {
-          this.isLoggedIn = (user !== null);
+          self.isLoggedIn = (user !== null);
           if(user) {
-            this.email = user.email;
-            this.uid = user.uid;
+            self.email = user.email;
+            self.uid = user.uid;
           }
         });
       },
@@ -85,9 +80,14 @@
           usersRef.child(user['.key']).remove()
         },
         sendVerify: function(email, password) {
-          firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-            console.log(error);
-          });
+          firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(function() {
+              this.verify();
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+          
         },
         createUser: function() {
           firebase.auth().createUserWithEmailAndPassword(this.user.email, this.user.password);
