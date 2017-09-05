@@ -13,6 +13,15 @@
       <input type="email" v-model="newUser.email" placeholder="email">
       <input type="submit" value="add user">
     </form>
+    <form id="form" v-on:submit.prevent="createUser">
+      <input type="text" v-model="user.email" placeholder="email">
+      <input type="password" v-model="user.password" placeholder="pass">
+      <input type="submit" value="add user">
+    </form>
+    <button v-on:click="verify">verify</button>
+    <div>
+      {{ email }} {{ uid }}
+    </div>
   </div>
 
   <script>
@@ -36,10 +45,34 @@
           name: '',
           email: '',
         },
+        user: {
+          email: '',
+          password: '',
+        },
+        email: 'none',
+        uid: 'none',
+        User: {},
+        isLoggedIn: null,
       },
 
       firebase: {
         users: usersRef
+      },
+
+      created() {
+        this.User = firebase.auth().currentUser;
+        if(this.User) {
+          this.email = this.User.email;
+          this.uid = this.User.uid;
+        }
+
+        firebase.auth().onAuthStateChanged(function(user) {
+          this.isLoggedIn = (user !== null);
+          if(user) {
+            this.email = user.email;
+            this.uid = user.uid;
+          }
+        });
       },
 
       methods: {
@@ -53,6 +86,17 @@
         },
         sendVerify: function(email, password) {
           firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+            console.log(error);
+          });
+        },
+        createUser: function() {
+          firebase.auth().createUserWithEmailAndPassword(this.user.email, this.user.password);
+        },
+        verify: function() {
+          var user = firebase.auth().currentUser;
+          user.sendEmailVerification().then(function() {
+            console.log('hoge');
+          }, function(error){
             console.log(error);
           });
         }
