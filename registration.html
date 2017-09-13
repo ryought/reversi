@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="./vue"></script>
+</head>
+<body>
+  <div id="app">
+    {{ message }}
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
+      },
+      created() {
+        console.log(this.$route.query.test);
+      },
+      computed: {
+        isValid: function() {
+          return this.message.length > 10
+        }
+      },
+      methods: {
+        addUser: function() {
+          console.log('hoge');
+        }
+      }
+    })
+  </script>
+</body>
+</html>

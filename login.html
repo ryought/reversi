@@ -11,12 +11,22 @@
     <form id="form" v-on:submit.prevent="createUser">
       <input type="text" v-model="user.email" placeholder="email">
       <input type="password" v-model="user.password" placeholder="pass">
+      <input type="text" v-model="user.name" placeholder="name">
       <input type="submit" value="add user">
     </form>
     <button v-on:click="verify">verify</button>
     <div>
       {{ email }} {{ uid }}
     </div>
+    <form id="form" v-on:submit.prevent="registerEmail">
+      <input type="text" v-model="user.email" placeholder="email">
+      <input type="submit" value="register">
+    </form>
+      {{ message }}
+    <form id="form" v-on:submit.prevent="confirm">
+      <input type="text" v-model="code" placeholder="code">
+      <input type="submit" value="register">
+    </form>
   </div>
 
   <script>
@@ -43,11 +53,15 @@
         user: {
           email: '',
           password: '',
+          name: '',
         },
         email: 'none',
         uid: 'none',
         User: {},
         isLoggedIn: null,
+        message: '',
+        code: '',
+        password: '',
       },
 
       firebase: {
@@ -71,6 +85,38 @@
       },
 
       methods: {
+        registerEmail: function() {
+          let self = this;
+          firebase.auth().createUserWithEmailAndPassword(self.user.email, self.generatePass())
+            .then(function() {
+              console.log(self.user.email, self.generatePass());
+              firebase.auth().sendPasswordResetEmail(self.user.email).then(function() {
+                console.log('finished');
+                self.message = 'check email';
+              })
+            });
+        },
+        confirm: function() {
+          let self = this;
+          console.log(self.code);
+          firebase.auth().verifyPasswordResetCode(self.code)
+            .then(function(email) {
+              console.log(email);
+              self.password = self.generatePass();
+              firebase.auth().confirmPasswordReset(code, self.password)
+                .then(function() {
+
+                });
+            });
+        },
+        generatePass: function() {
+          let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          let pass = '';
+          for(let i=0; i<16; i++) {
+            pass += chars[Math.floor(Math.random() * chars.length)];
+          }
+          return pass;
+        },
         addUser: function() {
           usersRef.push(this.newUser);
           this.newUser.name = '';
@@ -80,9 +126,16 @@
           usersRef.child(user['.key']).remove()
         },
         sendVerify: function(email, password) {
+          let self = this;
           firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(function() {
-              this.verify();
+              console.log('added');
+              let user = firebase.auth().currentUser;
+              user.updateProfile({
+                displayName: self.user.name
+              }).then(function() {
+                self.verify();
+              })
             })
             .catch(function(error) {
               console.log(error);
